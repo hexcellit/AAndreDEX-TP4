@@ -10,8 +10,6 @@ import SimpleDEXABI from '~~/abis/SimpleDEX.json';
 import TokenAABI from '~~/abis/TokenA.json';
 import TokenBABI from '~~/abis/TokenB.json';
 
-
-
 const DEXPage: React.FC = () => {
   const { address: connectedAddress } = useAccount();
   const [isOwner, setIsOwner] = useState(false);
@@ -93,7 +91,7 @@ const DEXPage: React.FC = () => {
       // First, approve the DEX contract to spend tokens
       await approveToken({
         address: swapDirection === 'A2B' ? TOKEN_A_CONTRACT : TOKEN_B_CONTRACT,
-        abi: TokenAABI, // Use TokenABI if applicable
+        abi: swapDirection === 'A2B' ? TokenAABI : TokenBABI,
         functionName: 'approve',
         args: [DEX_CONTRACT, parsedInput],
       });
@@ -126,13 +124,13 @@ const DEXPage: React.FC = () => {
       // First, approve the DEX contract to spend tokens
       await approveToken({
         address: TOKEN_A_CONTRACT,
-        abi: TokenAABI, // Use TokenABI if applicable
+        abi: TokenAABI,
         functionName: 'approve',
         args: [DEX_CONTRACT, parsedAmountA],
       });
       await approveToken({
         address: TOKEN_B_CONTRACT,
-        abi: TokenAABI, // Use TokenABI if applicable
+        abi: TokenBABI,
         functionName: 'approve',
         args: [DEX_CONTRACT, parsedAmountB],
       });
@@ -216,43 +214,59 @@ const DEXPage: React.FC = () => {
             <h3 className="text-lg font-medium">Token A</h3>
             <p className="text-sm">Price: {tokenAPrice && formatUnits(tokenAPrice, 18)}</p>
             <p className="text-sm">Reserve: {reserveA && formatUnits(reserveA, 18)}</p>
-            <input
-              type="number"
-              value={liquidityAmountA}
-              onChange={(e) => setLiquidityAmountA(e.target.value)}
-              placeholder="Enter amount of Token A"
-              className="flex-grow border rounded px-3 py-2 mt-2"
-            />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-medium">Token B</h3>
             <p className="text-sm">Price: {tokenBPrice && formatUnits(tokenBPrice, 18)}</p>
             <p className="text-sm">Reserve: {reserveB && formatUnits(reserveB, 18)}</p>
+          </div>
+        </div>
+
+        {/* Liquidity Management */}
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="flex-1">
+            <h3 className="text-lg font-medium">Add Liquidity</h3>
+            <input
+              type="number"
+              value={liquidityAmountA}
+              onChange={(e) => setLiquidityAmountA(e.target.value)}
+              placeholder="Enter Token A amount"
+              className="flex-grow border rounded px-3 py-2"
+            />
+          </div>
+          <div className="flex-1">
             <input
               type="number"
               value={liquidityAmountB}
               onChange={(e) => setLiquidityAmountB(e.target.value)}
-              placeholder="Enter amount of Token B"
-              className="flex-grow border rounded px-3 py-2 mt-2"
+              placeholder="Enter Token B amount"
+              className="flex-grow border rounded px-3 py-2"
             />
           </div>
         </div>
-        <div className="flex space-x-4">
-          <button 
-            onClick={handleAddLiquidity}
-            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-          >
-            Add Liquidity
-          </button>
-          {isOwner && (
+        <button 
+          onClick={handleAddLiquidity}
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        >
+          Add Liquidity
+        </button>
+        {isOwner && (
+          <>
             <button 
               onClick={handleRemoveLiquidity}
-              className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+              className="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600"
             >
               Remove Liquidity
             </button>
-          )}
-        </div>
+          </>
+        )}
+      </div>
+
+      {/* Prices Display */}
+      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-semibold mb-4">Token Prices</h2>
+        <p className="text-sm">Token A Price: {tokenAPrice && formatUnits(tokenAPrice, 18)} ETH</p>
+        <p className="text-sm">Token B Price: {tokenBPrice && formatUnits(tokenBPrice, 18)} ETH</p>
       </div>
     </div>
   );
