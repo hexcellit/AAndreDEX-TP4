@@ -1,23 +1,16 @@
 // page.tsx
-// Mark this file as a Client Component for client-side rendering
 'use client';
 
-// Import necessary React hooks and wagmi blockchain interaction hooks
 import React, { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
-// Import local components and ABIs
 import { Address } from '~~/components/scaffold-eth';
 import SimpleDEXABI from '~~/abis/SimpleDEX.json';
 import TokenAABI from '~~/abis/TokenA.json';
 import TokenBABI from '~~/abis/TokenB.json';
 
-// Define the main DEX Page component
 const DEXPage: React.FC = () => {
-  // Extract the connected wallet address using wagmi hook
   const { address: connectedAddress } = useAccount();
-  
-  // State to track if the connected address is the contract owner
   const [isOwner, setIsOwner] = useState(false);
   const [swapDirection, setSwapDirection] = useState<'A2B' | 'B2A'>('A2B');
   const [inputAmount, setInputAmount] = useState('');
@@ -25,12 +18,10 @@ const DEXPage: React.FC = () => {
   const [liquidityAmountA, setLiquidityAmountA] = useState('');
   const [liquidityAmountB, setLiquidityAmountB] = useState('');
 
-  // Contract addresses (to be replaced with actual deployed addresses)
   const DEX_CONTRACT = '0x...' as `0x${string}`;
   const TOKEN_A_CONTRACT = '0x...' as `0x${string}`;
   const TOKEN_B_CONTRACT = '0x...' as `0x${string}`;
 
-  // Read contract hooks to fetch blockchain data
   const { data: reserveA } = useReadContract({
     address: DEX_CONTRACT,
     abi: SimpleDEXABI,
@@ -57,7 +48,6 @@ const DEXPage: React.FC = () => {
     args: [TOKEN_B_CONTRACT],
   });
 
-  // Contract write hooks for blockchain transactions
   const { writeContract: swapTokens } = useWriteContract();
   const { writeContract: addLiquidity } = useWriteContract();
   const { writeContract: removeLiquidity } = useWriteContract();
@@ -78,7 +68,6 @@ const DEXPage: React.FC = () => {
     }
   }, [ownerAddress, connectedAddress]);
 
-  // Handler for token swapping
   const handleSwap = async () => {
     if (!inputAmount) return;
 
