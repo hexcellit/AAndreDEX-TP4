@@ -21,8 +21,6 @@ const deployerPrivateKey =
   process.env.__RUNTIME_DEPLOYER_PRIVATE_KEY ?? "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 // If not set, it uses our block explorers default API keys.
 const etherscanApiKey = process.env.ETHERSCAN_MAINNET_API_KEY || "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW";
-const etherscanOptimisticApiKey = process.env.ETHERSCAN_OPTIMISTIC_API_KEY || "RM62RDISS1RH448ZY379NX625ASG1N633R";
-const basescanApiKey = process.env.BASESCAN_API_KEY || "ZZZEIPMT1MNJ8526VV2Y744CA7TNZR64G6";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -59,43 +57,25 @@ const config: HardhatUserConfig = {
       url: `https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`,
       accounts: [deployerPrivateKey],
     },
-    scrollSepolia: {
-      url: "https://sepolia-rpc.scroll.io",
-      accounts: [deployerPrivateKey],
-    },
-    scroll: {
-      url: "https://rpc.scroll.io",
-      accounts: [deployerPrivateKey],
-    },
     pgn: {
-        url: "https://rpc.publicgoods.network",
-        accounts: [deployerPrivateKey],
-      },
-      pgnTestnet: {
-        url: "https://sepolia.publicgoods.network",
-        accounts: [deployerPrivateKey],
-      },
-      celo: {
-        url: "https://forno.celo.org",
-        accounts: [deployerPrivateKey],
-      },
-      celoAlfajores: {
-        url: "https://alfajores-forno.celo-testnet.org",
-        accounts: [deployerPrivateKey],
-      },
+      url: "https://rpc.publicgoods.network",
+      accounts: [deployerPrivateKey],
+    },
+    pgnTestnet: {
+      url: "https://sepolia.publicgoods.network",
+      accounts: [deployerPrivateKey],
+    },
+    celo: {
+      url: "https://forno.celo.org",
+      accounts: [deployerPrivateKey],
+    },
+    celoAlfajores: {
+      url: "https://alfajores-forno.celo-testnet.org",
+      accounts: [deployerPrivateKey],
+    },
   },
   etherscan: {
     apiKey: etherscanApiKey,
-    customChains: [
-      {
-        network: "scrollSepolia",
-        chainId: 534351,
-        urls: {
-          apiURL: "https://blockscout.scroll.io/api", // API URL for Scroll Sepolia
-          browserURL: "https://blockscout.scroll.io", // Browser URL for Scroll Sepolia
-        },
-      },
-    ],
   },
   verify: {
     etherscan: {
