@@ -1,4 +1,3 @@
-// page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -22,6 +21,7 @@ const DEXPage: React.FC = () => {
   const TOKEN_A_CONTRACT = '0x...' as `0x${string}`;
   const TOKEN_B_CONTRACT = '0x...' as `0x${string}`;
 
+  // Read Contracts with proper typing
   const { data: reserveA } = useReadContract({
     address: DEX_CONTRACT,
     abi: SimpleDEXABI,
@@ -48,11 +48,7 @@ const DEXPage: React.FC = () => {
     args: [TOKEN_B_CONTRACT],
   });
 
-  const { writeContract: swapTokens } = useWriteContract();
-  const { writeContract: addLiquidity } = useWriteContract();
-  const { writeContract: removeLiquidity } = useWriteContract();
-  const { writeContract: approveToken } = useWriteContract();
-
+  // Owner check with proper type handling
   const { data: ownerAddress } = useReadContract({
     address: DEX_CONTRACT,
     abi: SimpleDEXABI,
@@ -62,18 +58,27 @@ const DEXPage: React.FC = () => {
     }
   });
 
+  // Effect to check ownership
   useEffect(() => {
-    if (ownerAddress && connectedAddress) {
+    if (ownerAddress && connectedAddress && typeof ownerAddress === 'string') {
       setIsOwner(ownerAddress.toLowerCase() === connectedAddress.toLowerCase());
     }
   }, [ownerAddress, connectedAddress]);
 
+  // Contract interaction hooks
+  const { writeContract: swapTokens } = useWriteContract();
+  const { writeContract: addLiquidity } = useWriteContract();
+  const { writeContract: removeLiquidity } = useWriteContract();
+  const { writeContract: approveToken } = useWriteContract();
+
+  // Swap handler
   const handleSwap = async () => {
     if (!inputAmount) return;
 
     try {
       const parsedInput = parseUnits(inputAmount, 18);
       
+      // Approve tokens for swap
       await approveToken({
         address: swapDirection === 'A2B' ? TOKEN_A_CONTRACT : TOKEN_B_CONTRACT,
         abi: swapDirection === 'A2B' ? TokenAABI : TokenBABI,
@@ -81,6 +86,7 @@ const DEXPage: React.FC = () => {
         args: [DEX_CONTRACT, parsedInput],
       });
 
+      // Perform swap
       await swapTokens({
         address: DEX_CONTRACT,
         abi: SimpleDEXABI,
@@ -88,6 +94,7 @@ const DEXPage: React.FC = () => {
         args: [parsedInput],
       });
 
+      // Reset inputs
       setInputAmount('');
       setOutputAmount('');
     } catch (error) {
@@ -96,6 +103,7 @@ const DEXPage: React.FC = () => {
     }
   };
 
+  // Add Liquidity handler
   const handleAddLiquidity = async () => {
     if (!liquidityAmountA || !liquidityAmountB) return;
 
@@ -103,6 +111,7 @@ const DEXPage: React.FC = () => {
       const parsedAmountA = parseUnits(liquidityAmountA, 18);
       const parsedAmountB = parseUnits(liquidityAmountB, 18);
 
+      // Approve tokens for liquidity addition
       await approveToken({
         address: TOKEN_A_CONTRACT,
         abi: TokenAABI,
@@ -116,6 +125,7 @@ const DEXPage: React.FC = () => {
         args: [DEX_CONTRACT, parsedAmountB],
       });
 
+      // Add liquidity
       await addLiquidity({
         address: DEX_CONTRACT,
         abi: SimpleDEXABI,
@@ -123,6 +133,7 @@ const DEXPage: React.FC = () => {
         args: [parsedAmountA, parsedAmountB],
       });
 
+      // Reset inputs
       setLiquidityAmountA('');
       setLiquidityAmountB('');
     } catch (error) {
@@ -131,6 +142,7 @@ const DEXPage: React.FC = () => {
     }
   };
 
+  // Remove Liquidity handler
   const handleRemoveLiquidity = async () => {
     if (!liquidityAmountA || !liquidityAmountB) return;
 
@@ -138,6 +150,7 @@ const DEXPage: React.FC = () => {
       const parsedAmountA = parseUnits(liquidityAmountA, 18);
       const parsedAmountB = parseUnits(liquidityAmountB, 18);
 
+      // Remove liquidity
       await removeLiquidity({
         address: DEX_CONTRACT,
         abi: SimpleDEXABI,
@@ -145,6 +158,7 @@ const DEXPage: React.FC = () => {
         args: [parsedAmountA, parsedAmountB],
       });
 
+      // Reset inputs
       setLiquidityAmountA('');
       setLiquidityAmountB('');
     } catch (error) {
